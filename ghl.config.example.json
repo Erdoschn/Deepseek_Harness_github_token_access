@@ -1,0 +1,13 @@
+{
+  "$comment": "Copy to ghl.config.json and narrow it. Unknown keys are an error, on purpose.",
+  "version": 1,
+  "repos": {
+    "allow": ["your-name/your-repo"],
+    "deny": []
+  },
+  "permissions": ["read", "write"],
+  "denyOperations": [],
+  "allowRepoCreate": false,
+  "rawApi": false,
+  "auditLog": null
+}

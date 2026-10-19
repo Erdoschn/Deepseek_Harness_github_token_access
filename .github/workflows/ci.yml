@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        node: ['20.11', '22', '24']
+        include:
+          - os: windows-latest
+            node: '22'
+          - os: macos-latest
+            node: '22'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Tests
+        run: npm test
+
+      - name: CLI smoke test
+        run: node src/cli.mjs help
+
+  no-dependencies:
+    name: no runtime dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail if anything was added to dependencies
+        run: |
+          node -e "
+            const pkg = require('./package.json');
+            const deps = Object.keys(pkg.dependencies || {});
+            if (deps.length > 0) {
+              console.error('gh-latch must stay dependency-free, found: ' + deps.join(', '));
+              process.exit(1);
+            }
+            console.log('dependency-free');
+          "
+
+  policy-defaults:
+    name: deny by default
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: An empty policy must deny a write
+        run: |
+          workdir=$(mktemp -d)
+          cd "$workdir"
+          echo '{"version":1,"repos":{"allow":["*/*"]},"permissions":["read"]}' > ghl.config.json
+          set +e
+          GITHUB_TOKEN=dummy node "$GITHUB_WORKSPACE/src/cli.mjs" policy check commit.create acme/api
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit code 2 (denied), got $code"
+            exit 1
+          fi
+          echo "read-only policy correctly denied a write"

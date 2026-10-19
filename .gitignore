@@ -1,0 +1,9 @@
+node_modules/
+npm-debug.log*
+.gh-latch/
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log
+coverage/

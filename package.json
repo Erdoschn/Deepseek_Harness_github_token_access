@@ -1,0 +1,36 @@
+{
+  "name": "gh-latch",
+  "version": "0.1.0",
+  "description": "A latch for your GitHub token: policy-gated GitHub access for scripts, CI and AI agents.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ghl": "./src/cli.mjs"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "files": [
+    "src",
+    "docs",
+    "ghl.config.example.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/",
+    "check": "node --check src/cli.mjs && node --check src/policy.mjs && node --check src/github.mjs && node --check src/commands.mjs"
+  },
+  "keywords": [
+    "github",
+    "cli",
+    "security",
+    "least-privilege",
+    "ai-agents",
+    "policy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Erdoschn/gh-latch.git"
+  }
+}

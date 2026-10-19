@@ -1,0 +1,62 @@
+name: Bug report
+description: Something behaved differently than the policy said it would.
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please do not paste a real token, and do not include
+        anything from `~/.gh-latch/audit.jsonl` that you would not publish.
+
+  - type: input
+    id: version
+    attributes:
+      label: gh-latch version
+      description: Output of `ghl version`, or the commit you are on.
+      placeholder: '0.1.0'
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Node and OS
+      placeholder: 'node 22.12 on Ubuntu 24.04'
+    validations:
+      required: true
+
+  - type: textarea
+    id: policy
+    attributes:
+      label: Policy file
+      description: The `ghl.config.json` in effect, with repository names changed if they are private.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: The command you ran
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+
+  - type: dropdown
+    id: security
+    attributes:
+      label: Does this affect the security model?
+      description: For example, an operation that ran without being authorized.
+      options:
+        - 'No'
+        - 'Not sure'
+        - 'Yes — I will use private disclosure instead of this issue'
+    validations:
+      required: true

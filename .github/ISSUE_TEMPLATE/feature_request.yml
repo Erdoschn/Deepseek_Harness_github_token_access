@@ -1,0 +1,47 @@
+name: Feature request
+description: A command, a policy key, or a behaviour that would make the latch more useful.
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you write: this project says no on purpose. A narrow tool that is easy to
+        audit is worth more than a broad one. A request is most persuasive when it shows
+        the policy rule it would let you express.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation, not the solution — the situation is what gets designed around.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would the command or policy look like?
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What did you do instead?
+      description: Workarounds are valuable — they often become the documented recipe.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Which part of the project?
+      options:
+        - Policy engine
+        - An existing command
+        - A new command
+        - Documentation or a recipe
+        - Something else
+    validations:
+      required: true
