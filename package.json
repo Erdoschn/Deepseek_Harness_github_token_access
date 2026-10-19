@@ -18,7 +18,7 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test",
     "check": "node --check src/cli.mjs && node --check src/policy.mjs && node --check src/github.mjs && node --check src/commands.mjs"
   },
   "keywords": [
