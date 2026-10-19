@@ -215,14 +215,20 @@ async function requirePolicy(flags, cwd) {
   return { file, policy: await loadPolicyFile(file) };
 }
 
-function buildContext({ client, policy, flags, auditFile }) {
+function buildContext({ client, policy, flags, auditFile, stderr }) {
   return {
     client,
     policy,
     dryRun: Boolean(flags['--dry-run']),
     async record(entry) {
       if (flags['--no-audit']) return;
-      await appendAudit(auditFile, entry);
+      try {
+        await appendAudit(auditFile, entry);
+      } catch (error) {
+        // The GitHub call already happened; a broken audit path must not turn a
+        // successful write into a reported failure.
+        stderr.write(`ghl: warning: could not write the audit log (${auditFile}): ${error.message}\n`);
+      }
     },
   };
 }
@@ -289,7 +295,15 @@ async function run(argv, { cwd = process.cwd(), stdout = process.stdout, stderr 
       return EXIT.OK;
     }
     if (group === 'audit') {
-      const file = defaultAuditPath();
+      // Follow the active policy's auditLog when there is one, so `ghl audit` and the
+      // writer agree on the file.
+      let file = defaultAuditPath();
+      try {
+        const found = await findPolicyFile(cwd, flags['--policy']);
+        if (found) file = resolveAuditPath(await loadPolicyFile(found));
+      } catch (error) {
+        if (!(error instanceof UsageError)) throw error;
+      }
       const limit = Number(flags['--limit'] ?? 20);
       let text = '';
       try {
@@ -339,7 +353,7 @@ async function run(argv, { cwd = process.cwd(), stdout = process.stdout, stderr 
 
     const { policy } = await requirePolicy(flags, cwd);
     const auditFile = resolveAuditPath(policy);
-    const ctx = buildContext({ client, policy, flags, auditFile });
+    const ctx = buildContext({ client, policy, flags, auditFile, stderr });
 
     let result;
     let operation;

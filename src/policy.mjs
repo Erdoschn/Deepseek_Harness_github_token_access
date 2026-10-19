@@ -168,9 +168,11 @@ export function validatePolicy(input) {
 }
 
 export function parsePolicyJson(text) {
+  // Editors on Windows happily prepend a byte-order mark; JSON.parse does not.
+  const cleaned = text.replace(/^\uFEFF/, '');
   let parsed;
   try {
-    parsed = JSON.parse(text);
+    parsed = JSON.parse(cleaned);
   } catch (error) {
     throw new PolicyError(`policy is not valid JSON: ${error.message}`);
   }

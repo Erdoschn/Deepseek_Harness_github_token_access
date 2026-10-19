@@ -121,6 +121,11 @@ test('parsePolicyJson explains syntax errors', () => {
   assert.throws(() => parsePolicyJson('{ oops }'), /not valid JSON/);
 });
 
+test('a byte-order mark is tolerated', () => {
+  const policy = parsePolicyJson('\uFEFF{"version":1,"repos":{"allow":["acme/*"]}}');
+  assert.deepEqual(policy.repos.allow, ['acme/*']);
+});
+
 test('describePolicy lists every operation with its verdict', () => {
   const described = describePolicy(basePolicy());
   assert.deepEqual(described.permissions, ['read', 'write']);
